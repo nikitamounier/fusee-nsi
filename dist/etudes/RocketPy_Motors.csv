@@ -1,0 +1,9 @@
+Manufacturer,CAR Designation,Common Name,Motor Type,Diameter,Length,Total Weight,Prop. Weight,Avg. Thrust,Initial Thrust,Max. Thrust,Total Impulse,Burn Time,Isp,Motor Case,Propellant,Cert. Org.,Cert. Date,Cert. Designation,Availability,HazMat Shipping,CSFM Approved
+Cesaroni Technology,J360,J360,reload,38 mm,419 mm,709 g,413 g,360.0 N,554.6 N,828.0 N,826.0 Ns,1.9 s,204 s,Pro38-6G,,TRA,,J435 (29%),OOP,HazMat,
+Cesaroni Technology,6118M3100-P,M3100,reload,75 mm,757 mm,"5,018 g","2,903 g","3,075.0 N","3,306.8 N","3,709.2 N","6,117.8 Ns",2.0 s,215 s,Pro75-5G,White Thunder,CAR,"October 24, 2009",,regular,HazMat,approved
+Cesaroni Technology,7450M2505-P,M2505,reload,98 mm,579 mm,"6,250 g","3,339 g","2,491.0 N","2,330.2 N","2,952.6 N","7,450.0 Ns",3.0 s,,Pro98-3G,White Thunder,CAR,"May 9, 2002",M2505-P,regular,HazMat,
+Cesaroni Technology,6026M1670-P,M1670,reload,75 mm,757 mm,5231.00 g,2956.10 g,1667.80 N (375.25 lb),,2232.10 N,6041.70 Ns,3.63 s,208.41 s,,Blue Streak,CAR,,,,HazMat,approved
+Cesaroni Technology,6819M1540-P,M1540,reload,75 mm,757 mm,"5,906 g","3,624 g","1,537.0 N","1,945.6 N","2,328.8 N","6,819.4 Ns",4.4 s,,Pro75-5G,Imax,CAR,,6819-M1540-IM-P,regular,HazMat,approved
+Cesaroni Technology,6251M1400-P,M1400,reload,75 mm,757 mm,"5,302 g","2,992 g","1,398.0 N","1,820.6N","2,291.8N","6,251.0 Ns",4.5 s,213 s,Pro75-5G,Classic,CAR,"December 16, 2003",M1400-P-U,regular,HazMat,approved
+Cesaroni Technology,6438M1300-P,M1300,reload,75 mm,757 mm,"5,657 g","3,437 g","1,303.9 N","2,492.9 N","2,826.9 N","6,738.2 Ns",4.9 s,191 s,Pro75-5G,Imax/Dual Thrust,CAR,,6438-M1300-IM/DT-P,regular,HazMat,approved
+Hypertek,440CC076J-J115,J115,hybrid,54 mm,614 mm,"1,282 g",416 g,115.0 N,201.2 N,,673.7 Ns,5.9 s,,,,TRA,,,regular,exempt,
