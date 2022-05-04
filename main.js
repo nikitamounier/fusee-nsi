@@ -1,4 +1,6 @@
-import './style.css'
+import '/public/style.css'
+
+import Micromodal from 'micromodal'
 
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
@@ -8,8 +10,12 @@ import { InteractionManager } from 'three.interactive'
 import * as TWEEN from '@tweenjs/tween.js'
 
 import { Text } from 'troika-three-text'
-import GlitchedWriter, { wait } from 'glitched-writer'
-import { CircleGeometry } from 'three'
+import GlitchedWriter from 'glitched-writer'
+
+// Pages setup
+
+Micromodal.init()
+
 
 
 // Scene setup 
@@ -85,7 +91,7 @@ let stars = Array(10000).fill().map(createStar)
 
 const gltfLoader = new GLTFLoader()
 gltfLoader.load(
-  'rocket.glb',
+  '/rocket.glb',
   (model) => {
     scene.add(model.scene)
     model.scene.scale.set(2, 2, 2)
@@ -104,7 +110,7 @@ textTemplate.font = 'https://fonts.gstatic.com/s/orbitron/v23/yMJMMIlzdpvBhQQL_S
 textTemplate.fontSize = 1.5
 textTemplate.color = 0x33b5e5
 
-const circleGeometry = new THREE.CircleGeometry(1, 32);
+const circleGeometry = new THREE.CircleGeometry(0.4, 32);
 const circleMaterial = new THREE.MeshBasicMaterial({color: 0x33b5e5})
 const circleTemplate = new THREE.Mesh(circleGeometry, circleMaterial)
 circleTemplate.visible = false
@@ -119,7 +125,7 @@ function createLabel(text, x, y) {
   return label
 }
 
-function createLine(labelX, labelY) {
+function createLine(labelX, labelY, dotOffset) {
     const startPoint = new THREE.Vector3(labelX, labelY-3, 0)
     const endPoint = new THREE.Vector3(0, labelY-3, 0)
     const lineGeometry = lineGeometryTemplate.clone().setFromPoints([startPoint, endPoint])
@@ -127,44 +133,53 @@ function createLine(labelX, labelY) {
     line.visible = false
 
     const dot = circleTemplate.clone()
-    dot.position.x = endPoint
+    dot.position.y = labelY -3
+    dot.position.x = dotOffset
 
     return [line, dot]
 }
 
-const intro = {
-  title: createLabel('Introduction', -15, 15),
-  line: createLine(-15, 15)
+function addInteraction({title, line, modal}) {
+  title.addEventListener("mouseover", (event) => {
+    event.target.material.color.set(0x7dcbe8)
+  })
+  title.addEventListener("mouseout", (event) => {
+    event.target.material.color.set(0x33b5e5)
+  })
+  title.addEventListener("click", (_) => {
+      Micromodal.show(modal)
+  })
+  interactionManager.add(title)
 }
 
-const second = {
-  title: createLabel('Partie 1', 9, 10),
-  line: createLine(15, 10)
+const partie1 = {
+  title: createLabel('Moteur & Poids', -20, 12),
+  line: createLine(-20, 12, -1.65),
+  modal: "modal-1"
 }
 
-const third = {
-  title: createLabel('Partie 2', -15, 5),
-  line: createLine(-15, 5)
+const partie2 = {
+  title: createLabel('Carburant & Poids', 3, 5),
+  line: createLine(18.5, 5, 2.25),
+  modal: "modal-2"
 }
 
-const fourth = {
-  title: createLabel('Partie 3', 8, 0),
-  line: createLine(15, 0)
+const partie3 = {
+  title: createLabel('Impulsion Spécifique', -20, -3),
+  line: createLine(-20, -3, -2.25),
+  modal: "modal-3"
 }
 
-const fifth = {
-  title: createLabel('Partie 4', -15, -5),
-  line: createLine(-15, -5)
+const partie4 = {
+  title: createLabel('Simulations', 8.5, -10),
+  line: createLine(18, -10, 2.25),
+  modal: "modal-4"
 }
 
-const sixth = {
-  title: createLabel('Partie 5', 8, -10),
-  line: createLine(15, -10)
-}
-
-const labels = [intro, second, third, fourth, fifth, sixth]
-labels.forEach(({title, line}) => {
+const labels = [partie1, partie2, partie3, partie4]
+labels.forEach(({title, line, modal}) => {
   scene.add(title, line[0], line[1])
+  addInteraction({title, line, modal})
   }
 )
 
@@ -209,6 +224,8 @@ function animate() {
     }
     star.position.setY(star.position.y - (1 / (0.5 * Math.max(Math.abs(star.position.z), Math.abs(star.position.x)))))
   })
+
+  interactionManager.update()
 
   controls.update()
 
