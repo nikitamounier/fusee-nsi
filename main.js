@@ -129,14 +129,14 @@ function ligne(texteX, texteY, decalagePoint) {
     const startPoint = new THREE.Vector3(texteX, texteY-3, 0)
     const endPoint = new THREE.Vector3(0, texteY-3, 0)
     const lineGeometry = lineGeometryTemplate.clone().setFromPoints([startPoint, endPoint])
-    const line = new THREE.Line(lineGeometry, lineMaterial.clone())
-    line.visible = false
+    const ligne = new THREE.Line(lineGeometry, lineMaterial.clone())
+    ligne.visible = false
 
-    const dot = circleTemplate.clone()
-    dot.position.y = texteY - 3
-    dot.position.x = decalagePoint
+    const point = circleTemplate.clone()
+    point.position.y = texteY - 3
+    point.position.x = decalagePoint
 
-    return [line, dot]
+    return [ligne, point]
 }
 
 // Ajoute interaciton avec texte – pouvoir cliquer dessus
