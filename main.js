@@ -1,24 +1,24 @@
 import '/public/style.css'
 
-import Micromodal from 'micromodal'
+import Micromodal from 'micromodal' // Micro-bibliothèque qui permet de montrer des "modales" / pop-ups
 
+// Bibliothèque qui permet evironnement 3D dans site web, basé sur WebGL
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { InteractionManager } from 'three.interactive'
 
-import * as TWEEN from '@tweenjs/tween.js'
+import * as TWEEN from '@tweenjs/tween.js' // Permet de calculer changement de valeurs durant une animation
 
-import { Text } from 'troika-three-text'
-import GlitchedWriter from 'glitched-writer'
+import { Text } from 'troika-three-text' // Texte en 3D
+import GlitchedWriter from 'glitched-writer' // Effet visuel de cryptage dans texte
 
-// Pages setup
+// Setup des pages études
 
 Micromodal.init()
 
+// Setup de l'environnement 3D
 
-
-// Scene setup 
 const scene = new THREE.Scene()
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
@@ -26,12 +26,6 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#bg')
 })
-
-const interactionManager = new InteractionManager(
-  renderer,
-  camera,
-  renderer.domElement
-)
 
 renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
@@ -48,13 +42,18 @@ pointLight2.position.set(-5, 5, -5)
 const ambientLight = new THREE.AmbientLight(0xffffff)
 scene.add(pointLight1, pointLight2, ambientLight)
 
-// Mouse / trackpad control
+// Setup du gérant d'interaction, pour pouvoir cliquer sur des objets 3D
+
+const interactionManager = new InteractionManager(
+  renderer,
+  camera,
+  renderer.domElement
+)
+
+// Control de souris / trackpad
 
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableZoom = false
-
-// const axesHelper = new THREE.AxesHelper(5)
-// scene.add( axesHelper )
 
 // Window resize listener
 window.addEventListener('resize', onWindowResize, false)
@@ -65,15 +64,14 @@ function onWindowResize() {
     renderer.render(scene, camera)
 }
 
-// Star generation
+// Génération des étoiles
 
 const geometry = new THREE.SphereGeometry(0.25, 24, 24)
-const material = new THREE.MeshStandardMaterial({color: 0xffffff})
+const material = new THREE.MeshStandardMaterial({color: 0xffffff}) // couleur blanche
 const starTemplate = new THREE.Mesh(geometry, material)
 
-function createStar() {
-  
-  const star = starTemplate.clone()
+function etoile() { // création d'étoiles qui sont placés aléatoirement
+  const star = starTemplate.clone() // pour la performance, afin de ne pas créer un tout nouveau objet 3D à chaque fois
 
   const x = THREE.MathUtils.randFloatSpread(500)
   const y = THREE.MathUtils.randFloatSpread(500)
@@ -85,11 +83,11 @@ function createStar() {
   return star
 }
 
-let stars = Array(10000).fill().map(createStar)
+const etoiles = Array(10000).fill().map(etoile) // iteration, façon programmation fonctionelle
 
-// Rocket
+// Ajout du model 3D de la fusée à la scène
 
-const gltfLoader = new GLTFLoader()
+const gltfLoader = new GLTFLoader() // GTLF: format pour objets 3D fait pour le web
 gltfLoader.load(
   '/rocket.glb',
   (model) => {
@@ -99,14 +97,14 @@ gltfLoader.load(
   }
 )
 
-// Labels
+// Texte et lignes qui se trouvent dans scène
 
 const lineMaterial = new THREE.LineBasicMaterial({color: 0x33b5e5})
 const lineGeometryTemplate = new THREE.BufferGeometry()
 
 const textTemplate = new Text()
 textTemplate.visible = false
-textTemplate.font = 'https://fonts.gstatic.com/s/orbitron/v23/yMJMMIlzdpvBhQQL_SC3X9yhF25-T1nyxSmBoWg1fDAlp7lk.woff'
+textTemplate.font = 'https://fonts.gstatic.com/s/orbitron/v23/yMJMMIlzdpvBhQQL_SC3X9yhF25-T1nyxSmBoWg1fDAlp7lk.woff' // police de caractère futuristique
 textTemplate.fontSize = 1.5
 textTemplate.color = 0x33b5e5
 
@@ -116,7 +114,7 @@ const circleTemplate = new THREE.Mesh(circleGeometry, circleMaterial)
 circleTemplate.visible = false
 
 
-function createLabel(text, x, y) {
+function texte(text, x, y) {
   const label = textTemplate.clone()
   label.text = text
   label.position.x = x
@@ -125,80 +123,86 @@ function createLabel(text, x, y) {
   return label
 }
 
-function createLine(labelX, labelY, dotOffset) {
-    const startPoint = new THREE.Vector3(labelX, labelY-3, 0)
-    const endPoint = new THREE.Vector3(0, labelY-3, 0)
+// Createur de ligne en-dessous de texte dans scène, avec petit point à la fin
+
+function ligne(texteX, texteY, decalagePoint) {
+    const startPoint = new THREE.Vector3(texteX, texteY-3, 0)
+    const endPoint = new THREE.Vector3(0, texteY-3, 0)
     const lineGeometry = lineGeometryTemplate.clone().setFromPoints([startPoint, endPoint])
     const line = new THREE.Line(lineGeometry, lineMaterial.clone())
     line.visible = false
 
     const dot = circleTemplate.clone()
-    dot.position.y = labelY -3
-    dot.position.x = dotOffset
+    dot.position.y = texteY - 3
+    dot.position.x = decalagePoint
 
     return [line, dot]
 }
 
-function addInteraction({title, line, modal}) {
-  title.addEventListener("mouseover", (event) => {
+// Ajoute interaciton avec texte – pouvoir cliquer dessus
+
+function ajoutInteraction({titre, ligne, modal}) {
+  titre.addEventListener("mouseover", (event) => {
     event.target.material.color.set(0x7dcbe8)
   })
-  title.addEventListener("mouseout", (event) => {
+  titre.addEventListener("mouseout", (event) => {
     event.target.material.color.set(0x33b5e5)
   })
-  title.addEventListener("click", (_) => {
-      Micromodal.show(modal)
+  titre.addEventListener("click", (_) => {
+      Micromodal.show(modal) // Montre l'étude
   })
-  interactionManager.add(title)
+  interactionManager.add(titre)
 }
 
 const partie1 = {
-  title: createLabel('Moteur & Poids', -20, 12),
-  line: createLine(-20, 12, -1.65),
+  titre: texte('Moteur & Poids', -20, 12),
+  ligne: ligne(-20, 12, -1.65),
   modal: "modal-1"
 }
 
 const partie2 = {
-  title: createLabel('Carburant & Poids', 3, 5),
-  line: createLine(18.5, 5, 2.25),
+  titre: texte('Carburant & Poids', 3, 5),
+  ligne: ligne(18.5, 5, 2.25),
   modal: "modal-2"
 }
 
 const partie3 = {
-  title: createLabel('Impulsion Spécifique', -20, -3),
-  line: createLine(-20, -3, -2.25),
+  titre: texte('Impulsion Spécifique', -20, -3),
+  ligne: ligne(-20, -3, -2.25),
   modal: "modal-3"
 }
 
 const partie4 = {
-  title: createLabel('Simulations', 8.5, -10),
-  line: createLine(18, -10, 2.25),
+  titre: texte('Simulations', 8.5, -10),
+  ligne: ligne(18, -10, 2.25),
   modal: "modal-4"
 }
 
-const labels = [partie1, partie2, partie3, partie4]
-labels.forEach(({title, line, modal}) => {
-  scene.add(title, line[0], line[1])
-  addInteraction({title, line, modal})
+const parties = [partie1, partie2, partie3, partie4]
+
+parties.forEach(({titre, ligne, modal}) => {
+  scene.add(titre, ligne[0], ligne[1])
+  ajoutInteraction({titre, ligne, modal})
   }
 )
 
-const makeVisible = ({title, line}) => {
-  title.visible = true
-  line[0].visible = true
-  line[1].visible = true
+const devientVisible = ({titre, ligne}) => {
+  titre.visible = true
+  ligne[0].visible = true
+  ligne[1].visible = true
 }
 
 
-// Enter button
-const button = document.getElementById("enter")
-const writer = new GlitchedWriter(button)
-const phrases = ['Entrer', 'Appuyer', 'Bienvenue']
-writer.queueWrite(phrases, 5000, true)
+// Bouton "Entrer"
+const bouton = document.getElementById("enter")
+const writer = new GlitchedWriter(bouton)
+const mots = ['Entrer', 'Appuyer', 'Bienvenue']
+writer.queueWrite(mots, 5000, true)
 
-button.addEventListener("click", () => {
-  button.style.display = 'none'
+bouton.addEventListener("click", () => {
+  bouton.style.display = 'none'
 
+  // Animation lisse à nouvelle position quand on appuie sur bouton "Entrer"
   const coords = { x: camera.position.x, y: camera.position.y, z: camera.position.z}
   new TWEEN.Tween(coords)
     .to({ x: 0, y: 0, z: 30}, 2000)
@@ -207,22 +211,24 @@ button.addEventListener("click", () => {
       camera.position.set(coords.x, coords.y, coords.z)
     )
     .onComplete((_) => {
-      labels.forEach(makeVisible)
+      parties.forEach(devientVisible)
     })
     .start()
 }
 )
 
-// Animation loop
+// Boucle d'animation
 
-function animate() {
-  requestAnimationFrame(animate)
+function boucleAnimation() {
+  requestAnimationFrame(boucleAnimation)
 
-  stars.forEach(star => {
-    if (camera.position.y - star.position.y > (300 - Math.max(Math.abs(star.position.z), Math.abs(star.position.x)))) {
-      star.position.setY(500 - Math.max(Math.abs(star.position.z), Math.abs(star.position.x)))
+
+  // Simulation de l'effet de parallax (etoiles plus lointaines descendent moins vite) – calculé à la main
+  etoiles.forEach(etoile => {
+    if (camera.position.y - etoile.position.y > (300 - Math.max(Math.abs(etoile.position.z), Math.abs(etoile.position.x)))) {
+      etoile.position.setY(500 - Math.max(Math.abs(etoile.position.z), Math.abs(etoile.position.x)))
     }
-    star.position.setY(star.position.y - (1 / (0.5 * Math.max(Math.abs(star.position.z), Math.abs(star.position.x)))))
+    etoile.position.setY(etoile.position.y - (1 / (0.5 * Math.max(Math.abs(etoile.position.z), Math.abs(etoile.position.x)))))
   })
 
   interactionManager.update()
@@ -234,4 +240,4 @@ function animate() {
   renderer.render(scene, camera)
 }
 
-animate()
+boucleAnimation()
